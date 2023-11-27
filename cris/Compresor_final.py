@@ -1,10 +1,13 @@
-import math
-from MinHeap import Heap, HeapNode
-import bitarray
 
-class HuffmanNode(HeapNode):
+import zipfile
+import os
+from bitarray import bitarray
+import MinHeap
+
+class HuffmanNode:
     def __init__(self, key, value=None):
-        super().__init__(key, value)
+        self.key = key
+        self.value = value
         self.left_child = None
         self.right_child = None
 
@@ -12,14 +15,16 @@ class HuffmanCoding:
     def __init__(self):
         self.original_text = ""
         self.freq_table = {}
-        self.heap = Heap()
+        self.heap = MinHeap.Heap()
         self.huffman_tree = None
         self.table_conversion = {}
 
     def set_original_text(self, text):
-        with open(text, 'r') as file:#para imagen y video y audio es rb 
-            #para video y lo demas es bytes en vez de char
+
+        with open(text, 'r') as file:
             self.original_text = file.read()
+        
+        #self.original_text = text
 
     def calculate_frequency_table(self):
         for c in self.original_text:
@@ -29,7 +34,10 @@ class HuffmanCoding:
                 self.freq_table[c] = 1
 
     def create_huffman_tree(self):
-        elements = [HuffmanNode(key=freq, value=letter) for letter, freq in self.freq_table.items()]
+        elements = []
+
+        for letter, freq in self.freq_table.items():
+            elements.append(HuffmanNode(key=freq, value=letter))
 
         self.heap.build_heap(elements)
 
@@ -47,56 +55,58 @@ class HuffmanCoding:
 
     def calculate_table_conversion(self):
         self.table_conversion = {}
-        self.__dfs(self.huffman_tree, bitarray())
+        self.__dfs(self.huffman_tree, "")
 
     def __dfs(self, curr_node, current_code):
         if not curr_node.left_child and not curr_node.right_child:
-            self.table_conversion[curr_node.value] = current_code.copy()
+            self.table_conversion[curr_node.value] = current_code
         else:
             if curr_node.left_child:
-                current_code.append(False)  # 0
-                self.__dfs(curr_node.left_child, current_code)
-                current_code.pop()
+                self.__dfs(curr_node.left_child, current_code + "0")
 
             if curr_node.right_child:
-                current_code.append(True)  # 1
-                self.__dfs(curr_node.right_child, current_code)
-                current_code.pop()
+                self.__dfs(curr_node.right_child, current_code + "1")
 
     def get_compressed_text(self):
         compressed_text = ""
         for char in self.original_text:
             compressed_text += self.table_conversion[char]
             
-        #imagen abrir con rb y en vez de char byte
         file_compressed=bitarray()#en vez de regresar, ya usar bitarray  #donde se guarda los caracteres
         file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
-        with open("C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\\Compresor_de_archivos\\salida_file.txt", 'wb') as file:
+        with open("C:/Users/crisa/Downloads/salida_file.txt", 'wb') as file:
             file_compressed.tofile(file)
 
-    def decompress_text(self, file_compressed):#archivo que ya sacaste
+    def decompress_text(self, compressed_text):
         decoded_text = ""
         current_node = self.huffman_tree
 
         for bit in compressed_text:
-            if  bit:
+            if bit == "0":
                 current_node = current_node.left_child
             else:
                 current_node = current_node.right_child
-            
+
             if not current_node.left_child and not current_node.right_child:
                 decoded_text += current_node.value
                 current_node = self.huffman_tree
-                
-        with open("C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\\Compresor_de_archivos\\descomprimido_file.txt", 'w') as file:
-            decoded_text.write(file)
 
-         # retornas a la funcion de descompresion 
+        return decoded_text
+    
+    #class bitarray(self):#de simbolos a textos
+        '''encode for cada symbolo lo pasa a bitsarray 
+        abres el archivo y le metes lo que te regresa la clase'''
 
-# Crear una instancia de HuffmanCoding
+#para hacer simbolo usas la tabla de frecuencia y el texto comprimido
+# Ejemplo de uso
+original_text_path = 'H:/My Drive/programacion/Python/ESDI/ESDI3/archivo.txt'
+compressed_text_path = 'compressed_file.txt'
+decompressed_text_path = 'decompressed_file.txt'
+zip_file_path = 'compressed_file.zip'
+
+# Comprimir el archivo
 HC = HuffmanCoding()
-original_text = 'C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\\Compresor_de_archivos\\prueba1.txt'
-HC.set_original_text(original_text)
+HC.set_original_text(original_text_path)
 HC.calculate_frequency_table()
 HC.create_huffman_tree()
 HC.calculate_table_conversion()
@@ -110,26 +120,8 @@ print("Texto comprimido:", compressed_text)
 decoded_text = HC.decompress_text(compressed_text)
 print("Texto reconstruido: ", decoded_text, "\n")
 
-
-
-'''
-# Crear una instancia de HuffmanCoding
-HC = HuffmanCoding()
-original_text_path = "C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\Compresor_de_archivos\\prueba1.txt"
-compressed_text_path = 'compressed_file.txt'
-decompressed_text_path = 'decompressed_file.txt'
-
-HC.set_original_text(original_text_path)
-HC.calculate_frequency_table()
-HC.create_huffman_tree()
-HC.calculate_table_conversion()
-
-# Comprimir el archivo
-HC.get_compressed_text(compressed_text_path)
-print("Archivo comprimido y guardado como:", compressed_text_path)
-#aqui se guarda como binario y .txt
-
-# Descomprimir el archivo
-decoded_text = HC.decompress_text(compressed_text_path, decompressed_text_path)
-print("Archivo descomprimido y guardado como:", decompressed_text_path)
-'''
+# Guardar el archivo comprimido como texto
+with open(compressed_text_path, 'w') as file:
+    
+    
+    file.write(compressed_text)
