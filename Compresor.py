@@ -157,7 +157,7 @@ class HuffmanCoding:
         return compressed_text
 
     def decompress_aud(self, compressed_text):
-        decoded_text = bytearray()
+        decoded_text_aud = bytearray()
         current_node = self.huffman_tree
 
         for bit in compressed_text:
@@ -167,12 +167,12 @@ class HuffmanCoding:
                 current_node = current_node.right_child
 
             if not current_node.left_child and not current_node.right_child:
-                decoded_text += current_node.value
+                decoded_text_aud.append( current_node.value)
                 current_node = self.huffman_tree
         with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\descompreso_aud.mp3", 'wb') as file:
-            file.write(decoded_text)
+            file.write(decoded_text_aud)
 
-        return decoded_text
+        return decoded_text_aud
         
 
 
