@@ -3,6 +3,7 @@ import os
 from bitarray import bitarray
 import MinHeap
 
+
 class HuffmanNode:
     def __init__(self, key, value=None):
         self.key = key
@@ -113,7 +114,7 @@ class HuffmanCoding:
         return compressed_text
 
     def decompress_img(self, compressed_text):
-        decoded_text = ""
+        decoded_text = bytearray()
         current_node = self.huffman_tree
 
         for bit in compressed_text:
@@ -123,9 +124,9 @@ class HuffmanCoding:
                 current_node = current_node.right_child
 
             if not current_node.left_child and not current_node.right_child:
-                decoded_text += current_node.value
+                decoded_text.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompressoo_img.txt", 'wb') as file:
+        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompressoo_img.png", 'wb') as file:
             file.write(decoded_text)
 
         return decoded_text
@@ -159,7 +160,7 @@ with open(compressed_text_path, 'w') as file:
     file.write(compressed_text_text)
 
 '''
-original_text_path=r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\input_img.bmp'
+original_text_path=r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\imagen.jpg'
 # Comprimir la imagen
 HC_img = HuffmanCoding()
 HC_img.set_original_img(original_text_path)  # Cambiado a set_original_img
