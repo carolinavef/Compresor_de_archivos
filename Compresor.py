@@ -1,10 +1,12 @@
-import math
-from MinHeap import Heap, HeapNode
-import bitarray
+import zipfile
+import os
+from bitarray import bitarray
+import MinHeap
 
-class HuffmanNode(HeapNode):
+class HuffmanNode:
     def __init__(self, key, value=None):
-        super().__init__(key, value)
+        self.key = key
+        self.value = value
         self.left_child = None
         self.right_child = None
 
@@ -12,13 +14,17 @@ class HuffmanCoding:
     def __init__(self):
         self.original_text = ""
         self.freq_table = {}
-        self.heap = Heap()
+        self.heap = MinHeap.Heap()
         self.huffman_tree = None
         self.table_conversion = {}
 
     def set_original_text(self, text):
-        with open(text, 'r') as file:#para imagen y video y audio es rb 
-            #para video y lo demas es bytes en vez de char
+
+        with open(text, 'r') as file:
+            self.original_text = file.read()
+        
+    def set_original_img(self, img):
+        with open(img, 'rb') as file:
             self.original_text = file.read()
 
     def calculate_frequency_table(self):
@@ -29,7 +35,10 @@ class HuffmanCoding:
                 self.freq_table[c] = 1
 
     def create_huffman_tree(self):
-        elements = [HuffmanNode(key=freq, value=letter) for letter, freq in self.freq_table.items()]
+        elements = []
+
+        for letter, freq in self.freq_table.items():
+            elements.append(HuffmanNode(key=freq, value=letter))
 
         self.heap.build_heap(elements)
 
@@ -47,89 +56,128 @@ class HuffmanCoding:
 
     def calculate_table_conversion(self):
         self.table_conversion = {}
-        self.__dfs(self.huffman_tree, bitarray())
+        self.__dfs(self.huffman_tree, "")
 
     def __dfs(self, curr_node, current_code):
         if not curr_node.left_child and not curr_node.right_child:
-            self.table_conversion[curr_node.value] = current_code.copy()
+            self.table_conversion[curr_node.value] = current_code
         else:
             if curr_node.left_child:
-                current_code.append(False)  # 0
-                self.__dfs(curr_node.left_child, current_code)
-                current_code.pop()
+                self.__dfs(curr_node.left_child, current_code + "0")
 
             if curr_node.right_child:
-                current_code.append(True)  # 1
-                self.__dfs(curr_node.right_child, current_code)
-                current_code.pop()
+                self.__dfs(curr_node.right_child, current_code + "1")
+                
+                                                    #COMPRIMIR Y DESCOMPRIMIR ARCHIVO DE TEXTO
 
     def get_compressed_text(self):
         compressed_text = ""
         for char in self.original_text:
             compressed_text += self.table_conversion[char]
             
-        #imagen abrir con rb y en vez de char byte
         file_compressed=bitarray()#en vez de regresar, ya usar bitarray  #donde se guarda los caracteres
         file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
-        with open("C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\\Compresor_de_archivos\\salida_file.txt", 'wb') as file:
+        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compreso_txt.zip", 'wb') as file:
             file_compressed.tofile(file)
+            
+        return compressed_text
 
-    def decompress_text(self, file_compressed):#archivo que ya sacaste
+    def decompress_text(self, compressed_text):
         decoded_text = ""
         current_node = self.huffman_tree
 
         for bit in compressed_text:
-            if  bit:
+            if bit == "0":
                 current_node = current_node.left_child
             else:
                 current_node = current_node.right_child
-            
+
             if not current_node.left_child and not current_node.right_child:
                 decoded_text += current_node.value
                 current_node = self.huffman_tree
-                
-        with open("C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\\Compresor_de_archivos\\descomprimido_file.txt", 'w') as file:
-            decoded_text.write(file)
+        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompress_txt.txt", 'w') as file:
+            file.write(decoded_text)
 
-         # retornas a la funcion de descompresion 
+        return decoded_text
+                                                 #COMPRIMIR Y DESCOMPRIMIR IMAGENES
+    def get_compressed_img(self):          
+        compressed_text = ""
+        for char in self.original_text:
+            compressed_text += self.table_conversion[char]
+            
+        file_compressed=bitarray()
+        file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
+        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compressso_img.zip", 'wb') as file:
+            file_compressed.tofile(file)
+            
+        return compressed_text
 
-# Crear una instancia de HuffmanCoding
-HC = HuffmanCoding()
-original_text = 'C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\\Compresor_de_archivos\\prueba1.txt'
-HC.set_original_text(original_text)
-HC.calculate_frequency_table()
-HC.create_huffman_tree()
-HC.calculate_table_conversion()
-compressed_text = HC.get_compressed_text()
+    def decompress_img(self, compressed_text):
+        decoded_text = ""
+        current_node = self.huffman_tree
 
-# Imprimir resultados
-print("\nTexto original:", HC.original_text)
-print("Texto comprimido:", compressed_text)
+        for bit in compressed_text:
+            if bit == "0":
+                current_node = current_node.left_child
+            else:
+                current_node = current_node.right_child
+
+            if not current_node.left_child and not current_node.right_child:
+                decoded_text += current_node.value
+                current_node = self.huffman_tree
+        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompressoo_img.txt", 'wb') as file:
+            file.write(decoded_text)
+
+        return decoded_text
+
+
+
+# Ejemplo de uso
+#original_text_path = r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\input.txt'
+compressed_text_path = 'compressed_file2.txt'
+decompressed_text_path = 'decompressed_file2.txt'
+zip_file_path = 'compressed_file.zip'
+
+# Comprimir el archivo de texto
+'''HC_text = HuffmanCoding()
+HC_text.set_original_text(original_text_path)
+HC_text.calculate_frequency_table()
+HC_text.create_huffman_tree()
+HC_text.calculate_table_conversion()
+compressed_text_text = HC_text.get_compressed_text()
+
+# Imprimir resultados para el archivo de texto
+print("\nTexto original:", HC_text.original_text)
+print("Texto comprimido:", compressed_text_text)
 
 # Decodificar el texto comprimido
-decoded_text = HC.decompress_text(compressed_text)
-print("Texto reconstruido: ", decoded_text, "\n")
+decoded_text_text = HC_text.decompress_text(compressed_text_text)
+print("Texto reconstruido: ", decoded_text_text, "\n")
 
-
+# Guardar el archivo comprimido de texto
+with open(compressed_text_path, 'w') as file:
+    file.write(compressed_text_text)
 
 '''
-# Crear una instancia de HuffmanCoding
-HC = HuffmanCoding()
-original_text_path = "C:\\Users\\caro_\\OneDrive\\Documents\\GitHub\Compresor_de_archivos\\prueba1.txt"
-compressed_text_path = 'compressed_file.txt'
-decompressed_text_path = 'decompressed_file.txt'
+original_text_path=r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\input_img.bmp'
+# Comprimir la imagen
+HC_img = HuffmanCoding()
+HC_img.set_original_img(original_text_path)  # Cambiado a set_original_img
+HC_img.calculate_frequency_table()
+HC_img.create_huffman_tree()
+HC_img.calculate_table_conversion()
+compressed_text_img = HC_img.get_compressed_img()  # Cambiado a get_compressed_img
 
-HC.set_original_text(original_text_path)
-HC.calculate_frequency_table()
-HC.create_huffman_tree()
-HC.calculate_table_conversion()
+# Imprimir resultados para la imagen
+print("\nImagen original:", HC_img.original_text)
+print("Imagen comprimida:", compressed_text_img)
 
-# Comprimir el archivo
-HC.get_compressed_text(compressed_text_path)
-print("Archivo comprimido y guardado como:", compressed_text_path)
-#aqui se guarda como binario y .txt
+# Decodificar la imagen comprimida
+decoded_text_img = HC_img.decompress_img(compressed_text_img)
+print("Imagen reconstruida: ", decoded_text_img, "\n")
 
-# Descomprimir el archivo
-decoded_text = HC.decompress_text(compressed_text_path, decompressed_text_path)
-print("Archivo descomprimido y guardado como:", decompressed_text_path)
-'''
+# Guardar el archivo comprimido de imagen
+with open(compressed_text_path, 'w') as file:
+    file.write(compressed_text_img)
+
+          
