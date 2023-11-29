@@ -83,7 +83,7 @@ class HuffmanCoding:
             
         file_compressed=bitarray()#en vez de regresar, ya usar bitarray  #donde se guarda los caracteres
         file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
-        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compreso_txt.txt", 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compreso_txt.zip", 'wb') as file:
             file_compressed.tofile(file)
             
         return compressed_text
@@ -117,7 +117,7 @@ class HuffmanCoding:
             
         file_compressed=bitarray()
         file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
-        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compressso_img.zip", 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compressso_img.zip", 'wb') as file:
             file_compressed.tofile(file)
             
         return compressed_text
@@ -135,7 +135,7 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompressoo_img.png", 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompressoo_img.png", 'wb') as file:
             file.write(decoded_text)
 
         return decoded_text
@@ -200,7 +200,7 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text_vid.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompreso_aud.mp4", 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompreso_vid.mp4", 'wb') as file:
             file.write(decoded_text_vid)
 
         return decoded_text_vid
@@ -216,98 +216,59 @@ decompressed_text_path = 'decompressed_file2.txt'
 zip_file_path = 'compressed_file.zip'
 
 
-# TEXTOOOOOO
+def file_type(file_path):
+    _, file_extension = os.path.splitext(file_path)
+    return file_extension.lower()
 
-original_text_path = r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\archivo.txt'
-HC_text = HuffmanCoding()
-HC_text.set_original_text(original_text_path)
-HC_text.calculate_frequency_table()
-HC_text.create_huffman_tree()
-HC_text.calculate_table_conversion()
-compressed_text_text = HC_text.get_compressed_text()
+# FUNCIÓN PARA DETERMINAR EL TIPO DE ARCHIVO Y LLAMAR A LAS FUNCIONES CORRESPONDIENTES
+def process_file(file_path):
+    file_extension = file_type(file_path)
+    
+    # TEXTOOOOO
+    if file_extension == ".txt":
+        HC = HuffmanCoding()
+        HC.set_original_text(file_path)
+        HC.calculate_frequency_table()
+        HC.create_huffman_tree()
+        HC.calculate_table_conversion()
+        compressed_text = HC.get_compressed_text()
+        decoded_text = HC.decompress_text(compressed_text)
 
-# Imprimir resultados para el archivo de texto
-print("\nTexto original:", HC_text.original_text)
-print("Texto comprimido:", compressed_text_text)
-
-# Decodificar el texto comprimido
-decoded_text_text = HC_text.decompress_text(compressed_text_text)
-print("Texto reconstruido: ", decoded_text_text, "\n")
-
-# Guardar el archivo comprimido de texto
-with open(compressed_text_path, 'w') as file:
-    file.write(compressed_text_text)
-
-
-
-# IMAGENNNNNNNN
-
-
-original_text_path= r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\input_img.bmp'
-# Comprimir la imagen
-HC_img = HuffmanCoding()
-HC_img.set_original_img(original_text_path)  # Cambiado a set_original_img
-HC_img.calculate_frequency_table()
-HC_img.create_huffman_tree()
-HC_img.calculate_table_conversion()
-compressed_text_img = HC_img.get_compressed_img()  # Cambiado a get_compressed_img
-
-# Imprimir resultados para la imagen
-print("\nImagen original:", HC_img.original_text)
-print("Imagen comprimida:", compressed_text_img)
-
-# Decodificar la imagen comprimida
-decoded_text_img = HC_img.decompress_img(compressed_text_img)
-print("Imagen reconstruida: ", decoded_text_img, "\n")
-
-# Guardar el archivo comprimido de imagen
-with open(compressed_text_img, 'w') as file:
-    file.write(compressed_text_img)
+    # IMAGEEENNNNN
+    elif file_extension in {".bmp", ".png", ".jpg"}:
+        HC = HuffmanCoding()
+        HC.set_original_img(file_path)
+        HC.calculate_frequency_table()
+        HC.create_huffman_tree()
+        HC.calculate_table_conversion()
+        compressed_text = HC.get_compressed_img()
+        decoded_text = HC.decompress_img(compressed_text)
 
 
+    #AUDIOOOOO
+    elif file_extension == ".mp3":
+        HC = HuffmanCoding()
+        HC.set_original_aud(file_path)
+        HC.calculate_frequency_table()
+        HC.create_huffman_tree()
+        HC.calculate_table_conversion()
+        compressed_text = HC.get_compressed_aud()
+        decoded_text = HC.decompress_aud(compressed_text)
+     
 
-#AUDIOOOOOOO
+    #VIDEOOOOO
+    elif file_extension == ".mp4":
+        HC = HuffmanCoding()
+        HC.set_original_img(file_path)  
+        HC.calculate_frequency_table()
+        HC.create_huffman_tree()
+        HC.calculate_table_conversion()
+        compressed_text = HC.get_compressed_vid()
+        decoded_text = HC.decompress_vid(compressed_text)
+
+    else:
+        print(f"Unsupported file type: {file_extension}")
 
 
-original_audio_path= r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\audio2.mp3'
-
-HC_aud = HuffmanCoding()
-HC_aud.set_original_aud(original_audio_path)  # Cambiado a set_original_img
-HC_aud.calculate_frequency_table()
-HC_aud.create_huffman_tree()
-HC_aud.calculate_table_conversion()
-compressed_text_aud = HC_aud.get_compressed_aud()  # Cambiado a get_compressed_img
-
-# Imprimir resultados para la imagen
-print("\nImagen original:", HC_aud.original_text)
-print("Imagen comprimida:", compressed_text_aud)
-
-# Decodificar la imagen comprimida
-decoded_text_aud = HC_aud.decompress_aud(compressed_text_aud)
-print("Imagen reconstruida: ", decoded_text_aud, "\n")
-
-# Guardar el archivo comprimido de imagen
-with open(compressed_text_aud, 'w') as file:
-    file.write(compressed_text_aud)
-
-          
-# VIDEOOOO
-
-original_text_path= r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\Prueba1.mp4'
-
-HC_vid = HuffmanCoding()
-HC_vid.set_original_img(original_text_path)  
-HC_vid.calculate_frequency_table()
-HC_vid.create_huffman_tree()
-HC_vid.calculate_table_conversion()
-compressed_text_vid = HC_vid.get_compressed_vid()
-
-print("\nImagen original:", HC_vid.original_text)
-print("Imagen comprimida:", compressed_text_vid)
-
-decoded_text_aud = HC_vid.decompress_vid(compressed_text_vid)
-print("Imagen reconstruida: ", decoded_text_aud, "\n")
-
-# Guardar el archivo comprimido de imagen
-with open(compressed_text_vid, 'w') as file:
-    file.write(compressed_text_vid)
+file_to_process = r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\Prueba1.mp4'
+process_file(file_to_process)
