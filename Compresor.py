@@ -169,21 +169,56 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text_aud.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\descompreso_aud.mp3", 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompreso_aud.mp3", 'wb') as file:
             file.write(decoded_text_aud)
 
         return decoded_text_aud
-        
+    
+                                                       #   COMPRESS Y DESCOMPRESS VIDEOS 
+    def get_compressed_vid(self):          
+        compressed_text_vid = ""
+        for byte in self.original_text:
+            compressed_text_vid += self.table_conversion[byte]
+            
+        file_compressed=bitarray()
+        file_compressed.encode({byte: bitarray(code) for byte, code in self.table_conversion.items()},self.original_text)
+        with open(r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compreso_vid.zip', 'wb') as file:
+            file_compressed.tofile(file)
+            
+        return compressed_text_vid
+
+    def decompress_vid(self, compressed_text):
+        decoded_text_vid = bytearray()
+        current_node = self.huffman_tree
+
+        for bit in compressed_text:
+            if bit == "0":
+                current_node = current_node.left_child
+            else:
+                current_node = current_node.right_child
+
+            if not current_node.left_child and not current_node.right_child:
+                decoded_text_vid.append( current_node.value)
+                current_node = self.huffman_tree
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompreso_aud.mp4", 'wb') as file:
+            file.write(decoded_text_vid)
+
+        return decoded_text_vid
+    
 
 
-'''
-# Ejemplo de uso
-original_text_path = r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\archivo.txt'
+
+
+
+
 compressed_text_path = 'compressed_file2.txt'
 decompressed_text_path = 'decompressed_file2.txt'
 zip_file_path = 'compressed_file.zip'
 
-# Comprimir el archivo de texto
+
+# TEXTOOOOOO
+
+original_text_path = r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\archivo.txt'
 HC_text = HuffmanCoding()
 HC_text.set_original_text(original_text_path)
 HC_text.calculate_frequency_table()
@@ -202,9 +237,12 @@ print("Texto reconstruido: ", decoded_text_text, "\n")
 # Guardar el archivo comprimido de texto
 with open(compressed_text_path, 'w') as file:
     file.write(compressed_text_text)
-'''
 
-'''
+
+
+# IMAGENNNNNNNN
+
+
 original_text_path= r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\input_img.bmp'
 # Comprimir la imagen
 HC_img = HuffmanCoding()
@@ -225,7 +263,11 @@ print("Imagen reconstruida: ", decoded_text_img, "\n")
 # Guardar el archivo comprimido de imagen
 with open(compressed_text_img, 'w') as file:
     file.write(compressed_text_img)
-'''
+
+
+
+#AUDIOOOOOOO
+
 
 original_audio_path= r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\audio2.mp3'
 
@@ -247,4 +289,25 @@ print("Imagen reconstruida: ", decoded_text_aud, "\n")
 # Guardar el archivo comprimido de imagen
 with open(compressed_text_aud, 'w') as file:
     file.write(compressed_text_aud)
+
           
+# VIDEOOOO
+
+original_text_path= r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\Prueba1.mp4'
+
+HC_vid = HuffmanCoding()
+HC_vid.set_original_img(original_text_path)  
+HC_vid.calculate_frequency_table()
+HC_vid.create_huffman_tree()
+HC_vid.calculate_table_conversion()
+compressed_text_vid = HC_vid.get_compressed_vid()
+
+print("\nImagen original:", HC_vid.original_text)
+print("Imagen comprimida:", compressed_text_vid)
+
+decoded_text_aud = HC_vid.decompress_vid(compressed_text_vid)
+print("Imagen reconstruida: ", decoded_text_aud, "\n")
+
+# Guardar el archivo comprimido de imagen
+with open(compressed_text_vid, 'w') as file:
+    file.write(compressed_text_vid)
