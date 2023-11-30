@@ -1,11 +1,11 @@
-
+import zipfile
 import os
-from bitarray import bitarray
-import MinHeap
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
+from bitarray import bitarray
+import MinHeap
 
-                                    ##HUFFMAN 
 class HuffmanNode:
     def __init__(self, key, value=None):
         self.key = key
@@ -14,64 +14,26 @@ class HuffmanNode:
         self.right_child = None
 
 class HuffmanCoding:
-    def __init__(self,root):
-        self.root = root
-    
-        # Botones y etiquetas
-        self.select_file_button = tk.Button(root, text="Seleccionar Archivo", command=self.select_file)
-        self.select_file_button.pack(pady=10)
-
-        self.compress_button = tk.Button(root, text="Comprimir Archivo", command=self.process_file)
-        self.compress_button.pack(pady=10)
-        self.compress_button = tk.Button(root, text="Descomprimir Archivo", command=self.process_file)
-        self.compress_button.pack(pady=10)
-
-        self.file_label = tk.Label(root, text="")
-        self.file_label.pack(pady=10)
-        
-        #huffman
+    def __init__(self):
         self.original_text = ""
         self.freq_table = {}
         self.heap = MinHeap.Heap()
         self.huffman_tree = None
         self.table_conversion = {}
-    
-    #interfaz
-    def select_file(self):
-        file_path = filedialog.askopenfilename(title="Seleccionar archivo")
-        self.file_label.config(text=f"Archivo seleccionado: {os.path.basename(file_path)}")
-        self.set_original_text(file_path)  
-    
-    def interfaz_grafica(self, root):
-            if not self.original_text:
-                self.file_label.config(text="Selecciona un archivo primero.")
-                return
+        self.file_path = ""
 
-            compressed_file_path = filedialog.asksaveasfilename(title="Guardar archivo comprimido como", defaultextension=".compressed")
-            self.calculate_frequency_table()
-            self.create_huffman_tree()
-            self.calculate_table_conversion()
-            compressed_text = self.get_compressed_text()
-            
-            decompressed_file_path = filedialog.asksaveasfilename(title="Guardar archivo comprimido como", defaultextension=".compressed")
-            self.calculate_frequency_table()
-            self.create_huffman_tree()
-            self.calculate_table_conversion()
-            decompressed_text = self.get_compressed_text()
-
-            with open(compressed_file_path, 'wb') as file:
-                file.write(bitarray(compressed_text).tobytes())
-            
-            with open(decompressed_file_path, 'wb') as file:
-                file.write(bitarray(decompressed_text).tobytes())
-
-            self.file_label.config(text="Compresión completa")
-
-    #proceso huffman
     def set_original_text(self, text):
 
-        with open(text, 'rb') as file:
+        with open(text, 'r') as file:
             self.original_text = file.read()
+        self.file_path = text
+        
+    def set_original_file(self, file_path):
+        with open(file_path, 'rb') as file:
+            self.original_text = file.read()
+        self.file_path = file_path
+
+
 
     def calculate_frequency_table(self):
         for c in self.original_text:
@@ -113,7 +75,10 @@ class HuffmanCoding:
 
             if curr_node.right_child:
                 self.__dfs(curr_node.right_child, current_code + "1")
-                                                        #COMPRIMIR Y DESCOMPRIMIR ARCHIVO DE TEXTO
+                
+
+
+                                                    #COMPRIMIR Y DESCOMPRIMIR ARCHIVO DE TEXTO
 
     def get_compressed_text(self):
         compressed_text = ""
@@ -122,7 +87,7 @@ class HuffmanCoding:
             
         file_compressed=bitarray()#en vez de regresar, ya usar bitarray  #donde se guarda los caracteres
         file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compreso_txt.txt', 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compreso_txt.zip", 'wb') as file:
             file_compressed.tofile(file)
             
         return compressed_text
@@ -140,12 +105,15 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text += current_node.value
                 current_node = self.huffman_tree
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompress_txt.txt', 'w') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompress_txt.txt", 'w') as file:
             file.write(decoded_text)
 
         return decoded_text
    
-                                                 #COMPRIMIR Y DESCOMPRIMIR IMAGENES    
+                                                 #COMPRIMIR Y DESCOMPRIMIR IMAGENES
+
+    
+    
     def get_compressed_img(self):          
         compressed_text = ""
         for char in self.original_text:
@@ -153,7 +121,7 @@ class HuffmanCoding:
             
         file_compressed=bitarray()
         file_compressed.encode({char: bitarray(code) for char, code in self.table_conversion.items()},self.original_text)
-        with open(r"C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compressso_img.zip", 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compressso_img.zip", 'wb') as file:
             file_compressed.tofile(file)
             
         return compressed_text
@@ -171,10 +139,13 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\\descompressoo_img.png', 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompressoo_img.png", 'wb') as file:
             file.write(decoded_text)
 
         return decoded_text
+    
+    
+                                     
                                               #COMPRIMIR Y DESCOMPRIMIR AUDIOS
 
     def get_compressed_aud(self):          
@@ -184,7 +155,7 @@ class HuffmanCoding:
             
         file_compressed=bitarray()
         file_compressed.encode({byte: bitarray(code) for byte, code in self.table_conversion.items()},self.original_text)
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compreso_aud.zip', 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compreso_aud.zip", 'wb') as file:
             file_compressed.tofile(file)
             
         return compressed_text
@@ -202,7 +173,7 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text_aud.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\descompreso_aud.mp3', 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompreso_aud.mp3", 'wb') as file:
             file.write(decoded_text_aud)
 
         return decoded_text_aud
@@ -215,7 +186,7 @@ class HuffmanCoding:
             
         file_compressed=bitarray()
         file_compressed.encode({byte: bitarray(code) for byte, code in self.table_conversion.items()},self.original_text)
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\compreso_vid.zip', 'wb') as file:
+        with open(r'C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\compreso_vid.zip', 'wb') as file:
             file_compressed.tofile(file)
             
         return compressed_text_vid
@@ -233,70 +204,170 @@ class HuffmanCoding:
             if not current_node.left_child and not current_node.right_child:
                 decoded_text_vid.append( current_node.value)
                 current_node = self.huffman_tree
-        with open(r'C:\Users\caro_\OneDrive\Desktop\UP\Estructura de datos\PARCIAL 3\COMPRESOR DE ARCHIVOS\\descompreso_vid.mp4', 'wb') as file:
+        with open(r"C:\Users\1123122549\OneDrive - up.edu.mx\Documentos\UP\ESTRUCTURAS II\COMPRESOR\descompreso_vid.mp4", 'wb') as file:
             file.write(decoded_text_vid)
 
         return decoded_text_vid
+    
 
-    compressed_text_path = 'compressed_file2.txt'
-    decompressed_text_path = 'decompressed_file2.txt'
-    zip_file_path = 'compressed_file.zip'
 
-    def determine_file_type(file_path):
-        _, file_extension = os.path.splitext(file_path)
-        return file_extension.lower()
 
-# FUNCIÓN PARA DETERMINAR EL TIPO DE ARCHIVO Y LLAMAR A LAS FUNCIONES CORRESPONDIENTES
-    def process_file(self, file_path):
-        file_extension = self.determine_file_type(file_path)
+# INTERFAZ Y LLAMADA DE FUNCIONES
+
+class HuffmanGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Algoritmo Huffman")
+
         
-        # TEXTOOOOO
+        self.open_button = tk.Button(root, text="Abrir archivo", command=self.open_file)
+        self.compress_button = tk.Button(root, text="Comprimir", command=self.compress)
+        self.decompress_button = tk.Button(root, text="Descomprimir", command=self.decompress)
+
+ 
+        self.open_button.pack(pady=20)
+        self.compress_button.pack(pady=10)
+        self.decompress_button.pack(pady=10)
+
+       
+        self.HC = HuffmanCoding()
+
+    # BOTÓN ABRIR ARCHIVO
+
+    def open_file(self):
+        file_path = filedialog.askopenfilename(title="Seleccionar archivo")
+        if file_path:
+            file_extension = determine_file_type(file_path)
+            if file_extension == ".txt":
+                self.HC.set_original_text(file_path)
+                messagebox.showinfo("Archivo abierto", f"Ruta del archivo: {file_path}")
+            elif file_extension in {".bmp", ".png", ".jpg"}:
+                self.HC.set_original_file(file_path)
+                messagebox.showinfo("Archivo abierto", f"Ruta del archivo: {file_path}")
+            elif file_extension == ".mp3":
+                self.HC.set_original_file(file_path)
+                messagebox.showinfo("Archivo abierto", f"Ruta del archivo: {file_path}")
+            elif file_extension == ".mp4":
+                self.HC.set_original_file(file_path)
+                messagebox.showinfo("Archivo abierto", f"Ruta del archivo: {file_path}")
+            else:
+                messagebox.showwarning("Ruta inválida", f"Tipo de archivo: {file_extension}")
+
+    
+    #BOTÓN COMPRIMIR
+
+    def compress(self):
+        if not self.HC.file_path:  
+            messagebox.showwarning("No se encontró ningún archivo", "Selecciona un archivo primero.")
+            return
+
+        file_extension = determine_file_type(self.HC.file_path)  
         if file_extension == ".txt":
-            HC = HuffmanCoding()
-            HC.set_original_text(file_path)
-            HC.calculate_frequency_table()
-            HC.create_huffman_tree()
-            HC.calculate_table_conversion()
-            compressed_text = HC.get_compressed_text()
-            decoded_text = HC.decompress_text(compressed_text)
-
-        # IMAGEEENNNNN
+            self.compress_text()
         elif file_extension in {".bmp", ".png", ".jpg"}:
-            HC = HuffmanCoding()
-            HC.set_original_text(file_path)
-            HC.calculate_frequency_table()
-            HC.create_huffman_tree()
-            HC.calculate_table_conversion()
-            compressed_text = HC.get_compressed_img()
-            decoded_text = HC.decompress_img(compressed_text)
-
-
-        #AUDIOOOOO
+            self.compress_img()
         elif file_extension == ".mp3":
-            HC = HuffmanCoding()
-            HC.set_original_text(file_path)
-            HC.calculate_frequency_table()
-            HC.create_huffman_tree()
-            HC.calculate_table_conversion()
-            compressed_text = HC.get_compressed_aud()
-            decoded_text = HC.decompress_aud(compressed_text)
+            self.compress_aud()
+        elif file_extension == ".mp4":
+            self.compress_vid()
+        else:
+            messagebox.showwarning("Ruta inválida", f"Tipo de archivo: {file_extension}")
+
+    
+    #BOTÓN DESCOMPRIMIR
+
+    def decompress(self):
+        if not self.HC.file_path:  
+            messagebox.showwarning("No se encontró ningún archivo", "Selecciona un archivo primero.")
+            return
+
+        file_extension = determine_file_type(self.HC.file_path) 
+        if file_extension == ".txt":
+            self.decompress_text()
+        elif file_extension in {".bmp", ".png", ".jpg"}:
+            self.decompress_img()
+        elif file_extension == ".mp3":
+            self.decompress_aud()
+        elif file_extension == ".mp4":
+            self.decompress_vid()
+        else:
+            messagebox.showwarning("Ruta inválida", f"Tipo de archivo: {file_extension}")
+
+    # TEXTOOOOOOOO
+
+    def compress_text(self):
+        self.HC.calculate_frequency_table()
+        self.HC.create_huffman_tree()
+        self.HC.calculate_table_conversion()
+
+        self.HC.get_compressed_text()
+        messagebox.showinfo("Completado", "Archivo comprimido satisfactoriamente.")
+
+    def decompress_text(self):
+        compressed_text = self.HC.get_compressed_text()
+        self.HC.decompress_text(compressed_text)
+        messagebox.showinfo("Completado", "Archivo descomprimido satisfactoriamente.")
+
+    # IMAGENNNNNNN
+
+    def compress_img(self):
+        self.HC.calculate_frequency_table()
+        self.HC.create_huffman_tree()
+        self.HC.calculate_table_conversion()
+
+        self.HC.get_compressed_img()
+        messagebox.showinfo("Completado", "Archivo comprimido satisfactoriamente.")
+ 
+
+    def decompress_img(self):
+        compressed_text = self.HC.get_compressed_img()
+        self.HC.decompress_img(compressed_text)
+        messagebox.showinfo("Completado", "Archivo descomprimido satisfactoriamente.")
+
+    
+    # AUDIOOOOOO
+
+    def compress_aud(self):
+        self.HC.calculate_frequency_table()
+        self.HC.create_huffman_tree()
+        self.HC.calculate_table_conversion()
+
+        self.HC.get_compressed_aud()
+        messagebox.showinfo("Completado", "Archivo comprimido satisfactoriamente.")
+ 
+
+    def decompress_aud(self):
+        compressed_text = self.HC.get_compressed_aud()
+        self.HC.decompress_aud(compressed_text)
+        messagebox.showinfo("Completado", "Archivo descomprimido satisfactoriamente.")
+
+
+    # VIDEOOOOOOO
+   
+
+    def compress_vid(self):
+        self.HC.calculate_frequency_table()
+        self.HC.create_huffman_tree()
+        self.HC.calculate_table_conversion()
+
+        self.HC.get_compressed_vid()
+        messagebox.showinfo("Completado", "Archivo comprimido satisfactoriamente.")
+
+
+    def decompress_vid(self):
+        compressed_text = self.HC.get_compressed_vid()
+        self.HC.decompress_vid(compressed_text)
+        messagebox.showinfo("Completado", "Archivo descomprimido satisfactoriamente.")
         
 
-        #VIDEOOOOO
-        elif file_extension == ".mp4":
-            HC = HuffmanCoding()
-            HC.set_original_text(file_path)  
-            HC.calculate_frequency_table()
-            HC.create_huffman_tree()
-            HC.calculate_table_conversion()
-            compressed_text = HC.get_compressed_vid()
-            decoded_text = HC.decompress_vid(compressed_text)
+    
 
-        else:
-            print(f"Unsupported file type: {file_extension}")
 
+def determine_file_type(file_path):
+    _, file_extension = os.path.splitext(file_path)
+    return file_extension.lower()
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = HuffmanCoding(root)
+    gui = HuffmanGUI(root)
     root.mainloop()
