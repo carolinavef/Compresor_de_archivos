@@ -3,6 +3,8 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
+from tkinter import Tk
+from tkinter import Button
 from bitarray import bitarray
 import MinHeap
 
@@ -217,17 +219,31 @@ class HuffmanCoding:
 class HuffmanGUI:
     def __init__(self, root):
         self.root = root
+        self.root.configure(bg='#9c89b8')
         self.root.title("Algoritmo Huffman")
 
+        custom_font = ("Oswald", 10, "bold")
+
+        self.open_button = tk.Button(root, text="Abrir archivo", command=self.open_file, bg="#f0e6ef", width=20, borderwidth=10, relief=tk.GROOVE, font=custom_font)
+        self.compress_button = tk.Button(root, text="Comprimir", command=self.compress, bg="#f0e6ef", width=10, borderwidth=10, relief=tk.GROOVE, font=custom_font)
+        self.decompress_button = tk.Button(root, text="Descomprimir", command=self.decompress, bg="#f0e6ef", width=10, borderwidth=10, relief=tk.GROOVE, font=custom_font)
+
         
-        self.open_button = tk.Button(root, text="Abrir archivo", command=self.open_file)
-        self.compress_button = tk.Button(root, text="Comprimir", command=self.compress)
-        self.decompress_button = tk.Button(root, text="Descomprimir", command=self.decompress)
 
  
-        self.open_button.pack(pady=20)
-        self.compress_button.pack(pady=10)
+        self.open_button.pack(pady=10, padx=37, side=tk.LEFT)
+        self.compress_button.pack(pady=5)
         self.decompress_button.pack(pady=10)
+
+        root.geometry("460x230")
+
+        # Crear un frame para contener los otros dos botones
+        button_frame = tk.Frame(root)  # Color de fondo del frame
+        button_frame.pack(side=tk.RIGHT, padx=20)
+
+        # Colocar los botones "Comprimir" y "Descomprimir" en columna dentro del frame
+        self.compress_button.pack(pady=40, anchor=tk.N)
+        self.decompress_button.pack(pady=5, anchor=tk.S)
 
        
         self.HC = HuffmanCoding()
