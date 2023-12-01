@@ -1,7 +1,7 @@
 import zipfile
 import os
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog #librerias para interfaz
 from tkinter import messagebox
 from tkinter import Tk
 from tkinter import Button
@@ -16,6 +16,7 @@ class HuffmanNode:
         self.right_child = None
 
 class HuffmanCoding:
+    # Variables para almacenar información del archivo
     def __init__(self):
         self.original_text = ""
         self.freq_table = {}
@@ -24,19 +25,18 @@ class HuffmanCoding:
         self.table_conversion = {}
         self.file_path = ""
 
+    # Método para establecer con que archivo de texto se va a rtrabajar y leerlo
     def set_original_text(self, text):
 
         with open(text, 'r') as file:
             self.original_text = file.read()
         self.file_path = text
-        
+    # Método para establecer con que archivo de no texto que se va a trabajar y leerlo    
     def set_original_file(self, file_path):
         with open(file_path, 'rb') as file:
             self.original_text = file.read()
         self.file_path = file_path
-
-
-
+    #frecuencias 
     def calculate_frequency_table(self):
         for c in self.original_text:
             if c in self.freq_table:
@@ -44,6 +44,7 @@ class HuffmanCoding:
             else:
                 self.freq_table[c] = 1
 
+    #Aqui se usa el heap para crear el arbol de huffman 
     def create_huffman_tree(self):
         elements = []
 
@@ -63,11 +64,13 @@ class HuffmanCoding:
             self.heap.insert(nuevo_nodo)
             
         self.huffman_tree = self.heap.pop()
-
+    
+    #Genera la tabla de conversión de caracteres a códigos Huffman
     def calculate_table_conversion(self):
         self.table_conversion = {}
         self.__dfs(self.huffman_tree, "")
 
+    #busqueda a profundiad 
     def __dfs(self, curr_node, current_code):
         if not curr_node.left_child and not curr_node.right_child:
             self.table_conversion[curr_node.value] = current_code
